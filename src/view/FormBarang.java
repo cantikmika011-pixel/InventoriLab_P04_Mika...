@@ -14,6 +14,9 @@ public class FormBarang extends javax.swing.JFrame {
 
     public FormBarang() {
         initComponents();
+        siapkanTabel();
+        isiDataContoh();
+        setLocationRelativeTo(null);
     }
 
     private void siapkanTabel() {
@@ -37,50 +40,57 @@ public class FormBarang extends javax.swing.JFrame {
         perbaruiTabel();
         lblStatus.setText("Siap. Dua data contoh dimuat di memori.");
     }
-private void perbaruiTabel() {
-    modelTabel.setRowCount(0);
-    for (Barang barang : daftarBarang) {
-        modelTabel.addRow(new Object[]{
-            barang.getKode(),
-            barang.getNama(),
-            barang.getJumlahTersedia()
-        });
-    }
-}
-private void bersihkanInput() {
-    txtKode.setText("");
-    txtNama.setText("");
-    txtJumlah.setText("");
-    txtKode.requestFocusInWindow();
-}
-private void tambahDemo() {
-    String kode = txtKode.getText().trim();
-    String nama = txtNama.getText().trim();
-    String teksJumlah = txtJumlah.getText().trim();
 
-    try {
-        if (kode.isEmpty() || nama.isEmpty() || teksJumlah.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Kode, nama, dan jumlah wajib diisi.");
+    private void perbaruiTabel() {
+        modelTabel.setRowCount(0);
+        for (Barang barang : daftarBarang) {
+            modelTabel.addRow(new Object[]{
+                barang.getKode(),
+                barang.getNama(),
+                barang.getJumlahTersedia()
+            });
         }
-        private void tambahDemo() {
-    String kode = txtKode.getText().trim();
-    String nama = txtNama.getText().trim();
-    String teksJumlah = txtJumlah.getText().trim();
-
-    try {
-        if (kode.isEmpty() || nama.isEmpty() || teksJumlah.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Kode, nama, dan jumlah wajib diisi.");
-        } 
-        txtJumlah.requestFocusInWindow();
-        txtJumlah.selectAll();
-    } catch (IllegalArgumentException e) {
-        lblStatus.setText("Data tidak ditambahkan: " + e.getMessage());
-        JOptionPane.showMessageDialog(this, e.getMessage(),
-                "Periksa data barang", JOptionPane.WARNING_MESSAGE);
     }
-}
+
+    private void bersihkanInput() {
+        txtKode.setText("");
+        txtNama.setText("");
+        txtJumlah.setText("");
+        txtKode.requestFocusInWindow();
+    }
+
+    private void tambahDemo() {
+        String kode = txtKode.getText().trim();
+        String nama = txtNama.getText().trim();
+        String teksJumlah = txtJumlah.getText().trim();
+
+        try {
+            if (kode.isEmpty() || nama.isEmpty() || teksJumlah.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Kode, nama, dan jumlah wajib diisi.");
+            }
+
+            int jumlah = Integer.parseInt(teksJumlah);
+            Barang barang = new Barang(kode, nama, jumlah);
+            daftarBarang.add(barang);
+            perbaruiTabel();
+            bersihkanInput();
+            lblStatus.setText("Barang " + barang.getNama()
+                    + " ditambahkan ke daftar sementara.");
+        } catch (NumberFormatException e) {
+            lblStatus.setText("Jumlah belum valid. Data tidak ditambahkan.");
+            JOptionPane.showMessageDialog(this,
+                    "Jumlah harus bilangan bulat antara 0 dan 2147483647.",
+                    "Input jumlah", JOptionPane.WARNING_MESSAGE);
+            txtJumlah.requestFocusInWindow();
+            txtJumlah.selectAll();
+        } catch (IllegalArgumentException e) {
+            lblStatus.setText("Data tidak ditambahkan: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, e.getMessage(),
+                    "Periksa data barang", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -118,15 +128,12 @@ private void tambahDemo() {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Inventori Laboratorium - Data Barang");
-        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         lblJudul.setFont(new java.awt.Font("Dialog", 1, 22)); // NOI18N
         lblJudul.setText("INVENTORI LABORATORIUM.");
-        getContentPane().add(lblJudul, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 340, -1));
 
         lblInfo.setFont(new java.awt.Font("Dialog", 0, 13)); // NOI18N
         lblInfo.setText(" Latihan antarmuka - data tersimpan sementara.");
-        getContentPane().add(lblInfo, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, -1, -1));
 
         pnlInput.setBorder(javax.swing.BorderFactory.createTitledBorder("Input Barang"));
 
@@ -144,10 +151,25 @@ private void tambahDemo() {
         lblJumlah.setText("Jumlah Tersedia");
 
         btnTambah.setText("Tambah Demo");
+        btnTambah.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnTambahActionPerformed(evt);
+            }
+        });
 
         btnBersihkan.setText("Bersihkan Input");
+        btnBersihkan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBersihkanActionPerformed(evt);
+            }
+        });
 
         btnTutup.setText("Tutup");
+        btnTutup.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnTutupActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnlInputLayout = new javax.swing.GroupLayout(pnlInput);
         pnlInput.setLayout(pnlInputLayout);
@@ -177,7 +199,7 @@ private void tambahDemo() {
                         .addComponent(btnBersihkan)
                         .addGap(70, 70, 70)
                         .addComponent(btnTutup)))
-                .addContainerGap(37, Short.MAX_VALUE))
+                .addContainerGap(115, Short.MAX_VALUE))
         );
         pnlInputLayout.setVerticalGroup(
             pnlInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -199,10 +221,8 @@ private void tambahDemo() {
                     .addComponent(btnTambah)
                     .addComponent(btnBersihkan)
                     .addComponent(btnTutup))
-                .addContainerGap(14, Short.MAX_VALUE))
+                .addContainerGap(13, Short.MAX_VALUE))
         );
-
-        getContentPane().add(pnlInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 80, 550, 210));
 
         tblBarang.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -217,10 +237,40 @@ private void tambahDemo() {
         ));
         jScrollPane2.setViewportView(tblBarang);
 
-        getContentPane().add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 297, 550, 110));
-
         lblStatus.setText("Siap. Isi data barang.");
-        getContentPane().add(lblStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 420, -1, -1));
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(lblJudul, javax.swing.GroupLayout.PREFERRED_SIZE, 340, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(lblInfo))
+            .addComponent(pnlInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 620, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(lblStatus))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(lblJudul)
+                .addGap(11, 11, 11)
+                .addComponent(lblInfo)
+                .addGap(12, 12, 12)
+                .addComponent(pnlInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(30, 30, 30)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(30, 30, 30)
+                .addComponent(lblStatus))
+        );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -228,6 +278,18 @@ private void tambahDemo() {
     private void txtNamaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNamaActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtNamaActionPerformed
+
+    private void btnTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahActionPerformed
+ tambahDemo();    }//GEN-LAST:event_btnTambahActionPerformed
+
+    private void btnBersihkanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBersihkanActionPerformed
+   bersihkanInput();
+lblStatus.setText("Input dibersihkan. Daftar barang tetap.");
+    }//GEN-LAST:event_btnBersihkanActionPerformed
+
+    private void btnTutupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTutupActionPerformed
+      dispose();
+    }//GEN-LAST:event_btnTutupActionPerformed
 
     /**
      * @param args the command line arguments
